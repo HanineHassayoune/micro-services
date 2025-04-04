@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="config-server" />
         <module name="notification" />
+        <module name="security" />
         <module name="ticket" />
         <module name="gateway" />
         <module name="discovery" />
@@ -25,6 +26,7 @@
       <module name="discovery" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="notification" options="-parameters" />
+      <module name="security" options="-parameters" />
       <module name="ticket" options="-parameters" />
     </option>
   </component>

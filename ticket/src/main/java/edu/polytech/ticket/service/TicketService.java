@@ -19,4 +19,6 @@ public class TicketService {
     public List<TicketEntity>findAllTickets(){
         return repository.findAll();
     }
+
+
 }
