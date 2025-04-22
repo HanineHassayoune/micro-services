@@ -47,6 +47,10 @@ spring:
           uri: lb://authentications
           predicates:
             - Path=/api/v1/projects/**
+        - id: authentication-passwords
+          uri: lb://authentications
+          predicates:
+            - Path=/api/v1/password/**
 
 
 
