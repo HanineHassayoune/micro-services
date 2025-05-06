@@ -10,12 +10,12 @@ public class AuthFeignClientService {
         this.authFeignClient = authFeignClient;
     }
 
-    public Boolean validateToken(String token) {
+    /*public Boolean validateToken(String token) {
         String authorizationHeader = "Bearer " + token;
         Boolean response = authFeignClient.validateToken(authorizationHeader);
         System.out.println("Réponse du Feign Client: " + response);
         return response;
-    }
+    }*/
 
 
 

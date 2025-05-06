@@ -3,8 +3,9 @@ package edu.polytech.ticket.repository;
 import edu.polytech.ticket.entity.TicketEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.UUID;
+import java.util.List;
 
-public interface TicketRepository extends JpaRepository<TicketEntity, UUID> {
+public interface TicketRepository extends JpaRepository<TicketEntity, Integer> {
+    List<TicketEntity> findByProjectId(Long projectId);
 }
 

@@ -24,5 +24,7 @@ public enum Status {
     REJECTED_BY_TEAM_MEMBER,
     APPROVED_BY_TEAM_MEMBER,
     CANCELLED_BY_TEAM_MEMBER,
-
+    OPEN,
+    RESOLVED,
+    CLOSED
 }
