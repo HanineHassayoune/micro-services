@@ -86,4 +86,19 @@ public class TicketController {
     }
 
 
+    @PutMapping("/{ticketId}/assign")
+    public ResponseEntity<TicketEntity> assignUserToTicket(
+            @PathVariable Integer ticketId,
+            @RequestParam Integer userId
+    ) {
+        TicketEntity ticket = ticketService.findTicketById(ticketId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+
+        ticket.setAssignedUserId(userId);
+        ticketService.saveTicket(ticket);
+        return ResponseEntity.ok(ticket);
+    }
+
+
+
 }

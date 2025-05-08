@@ -3,7 +3,7 @@ package edu.polytech.ticket.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 
 
 import java.util.List;
@@ -40,6 +40,10 @@ public class TicketEntity {
 
     @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL,orphanRemoval = true)
     private SolutionEntity solution;
+
+    @Column(name = "assigned_user_id")
+    private Integer assignedUserId;
+
 
     //@ManyToOne
     //@JoinColumn(name = "project_id")

@@ -1,6 +1,7 @@
 package edu.polytech.ticket.feign;
 
 import edu.polytech.ticket.dto.ProjectDto;
+import edu.polytech.ticket.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,9 @@ public interface AuthFeignClient {
 
     @GetMapping("/api/v1/projects/title/{title}")
     ProjectDto getProjectByTitle(@PathVariable String title);
+
+    @GetMapping("/api/v1/users/{id}")
+    UserDto getUserById(@PathVariable Integer id);
 }
 
 
