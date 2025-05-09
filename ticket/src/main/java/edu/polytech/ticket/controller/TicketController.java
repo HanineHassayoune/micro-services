@@ -24,16 +24,15 @@ public class TicketController {
 
     private final AuthFeignClientService authFeignClientService;
     private final TicketService ticketService;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @PostMapping(consumes = {"application/json", "application/x-ndjson"})
     public void createFromFluentd(@RequestBody String rawLog) {
         System.out.println("✅ RECEIVED NDJSON Ticket(s):\n" + rawLog);
-        ObjectMapper mapper = new ObjectMapper();
-
         try {
-            String[] jsonLines = rawLog.split("\\r?\\n"); // Split NDJSON into lines
+            String[] jsonLines = rawLog.split("\\r?\\n");
             for (String line : jsonLines) {
-                if (line.trim().isEmpty()) continue; // Skip empty lines
+                if (line.trim().isEmpty()) continue;
 
                 Map<String, Object> logMap = mapper.readValue(line, Map.class);
 
@@ -41,7 +40,6 @@ public class TicketController {
                         .status(Status.PENDING)
                         .title((String) logMap.get("message"))
                         .priority(Priority.LOW)
-                        //.description((String) logMap.get("message"))
                         .level((String) logMap.get("level"))
                         .date((String) logMap.get("@timestamp"))
                         .projectName((String) logMap.get("projectName"))
@@ -53,12 +51,11 @@ public class TicketController {
                 TicketEntity ticket = TicketEntity.builder()
                         .status(dto.getStatus())
                         .title(dto.getTitle())
-                        //.description(dto.getDescription())
-                        .date(dto.getDate())
-                        .level(dto.getLevel())
-                        .loggerName(dto.getLoggerName())
-                        .projectName(dto.getProjectName())
                         .priority(dto.getPriority())
+                        .level(dto.getLevel())
+                        .date(dto.getDate())
+                        .projectName(dto.getProjectName())
+                        .loggerName(dto.getLoggerName())
                         .stackTrace(dto.getStackTrace())
                         .type(dto.getType())
                         .build();
@@ -73,21 +70,22 @@ public class TicketController {
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<TicketEntity>> getTicketsByProjectId(@PathVariable Long projectId) {
-        List<TicketEntity> tickets = ticketService.getTicketsByProjectId(projectId);
-        return ResponseEntity.ok(tickets);
+    public ResponseEntity<List<LogTicketDto>> getTicketsByProjectId(@PathVariable Long projectId) {
+        List<LogTicketDto> dtos = ticketService.getTicketsByProjectId(projectId).stream()
+                .map(ticketService::toDto)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{ticketId}")
-    public ResponseEntity<TicketEntity> getTicketById(@PathVariable Integer ticketId) {
-        return ticketService.findTicketById(ticketId)
-                .map(ResponseEntity::ok)
+    public ResponseEntity<LogTicketDto> getTicketById(@PathVariable Integer ticketId) {
+        TicketEntity ticket = ticketService.findTicketById(ticketId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found with ID: " + ticketId));
+        return ResponseEntity.ok(ticketService.toDto(ticket));
     }
 
-
     @PutMapping("/{ticketId}/assign")
-    public ResponseEntity<TicketEntity> assignUserToTicket(
+    public ResponseEntity<LogTicketDto> assignUserToTicket(
             @PathVariable Integer ticketId,
             @RequestParam Integer userId
     ) {
@@ -96,9 +94,7 @@ public class TicketController {
 
         ticket.setAssignedUserId(userId);
         ticketService.saveTicket(ticket);
-        return ResponseEntity.ok(ticket);
+        return ResponseEntity.ok(ticketService.toDto(ticket));
     }
-
-
-
 }
+

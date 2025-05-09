@@ -31,6 +31,10 @@ spring:
           uri: lb://tickets
           predicates:
             - Path=/api/v1/tickets/**
+        - id: ticket-comments
+          uri: lb://tickets
+          predicates:
+            - Path=/api/v1/comments/**
         - id: notifications
           uri: lb://notifications
           predicates:

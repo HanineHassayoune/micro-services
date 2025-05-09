@@ -1,5 +1,6 @@
 package edu.polytech.ticket.service;
 
+import edu.polytech.ticket.dto.LogTicketDto;
 import edu.polytech.ticket.dto.ProjectDto;
 import edu.polytech.ticket.entity.TicketEntity;
 import edu.polytech.ticket.feign.AuthFeignClient;
@@ -54,6 +55,25 @@ public class TicketService {
 
     public Optional<TicketEntity> findTicketById(Integer id) {
         return repository.findById(id);
+    }
+
+
+    public LogTicketDto toDto(TicketEntity entity) {
+        return LogTicketDto.builder()
+                .id(entity.getId())
+                .status(entity.getStatus())
+                .title(entity.getTitle())
+                .priority(entity.getPriority())
+                .imageUrl(entity.getImageUrl())
+                .level(entity.getLevel())
+                .date(entity.getDate())
+                .projectName(entity.getProjectName())
+                .loggerName(entity.getLoggerName())
+                .type(entity.getType())
+                .projectId(entity.getProjectId())
+                .stackTrace(entity.getStackTrace())
+                .assignedUserId(entity.getAssignedUserId())
+                .build();
     }
 
 
