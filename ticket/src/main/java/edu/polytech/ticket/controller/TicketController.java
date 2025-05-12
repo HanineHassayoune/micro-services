@@ -6,6 +6,7 @@ import edu.polytech.ticket.entity.Priority;
 import edu.polytech.ticket.entity.Status;
 import edu.polytech.ticket.entity.TicketEntity;
 import edu.polytech.ticket.feign.AuthFeignClientService;
+import edu.polytech.ticket.repository.TicketRepository;
 import edu.polytech.ticket.service.TicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -24,6 +25,7 @@ public class TicketController {
 
     private final AuthFeignClientService authFeignClientService;
     private final TicketService ticketService;
+    private final TicketRepository ticketRepository;
     private final ObjectMapper mapper = new ObjectMapper();
 
     @PostMapping(consumes = {"application/json", "application/x-ndjson"})
@@ -96,5 +98,12 @@ public class TicketController {
         ticketService.saveTicket(ticket);
         return ResponseEntity.ok(ticketService.toDto(ticket));
     }
+
+    @GetMapping("/assigned/{userId}")
+    public ResponseEntity<List<TicketEntity>> getAssignedTickets(@PathVariable Integer userId) {
+        List<TicketEntity> tickets = ticketRepository.findByAssignedUserId(userId);
+        return ResponseEntity.ok(tickets);
+    }
+
 }
 
