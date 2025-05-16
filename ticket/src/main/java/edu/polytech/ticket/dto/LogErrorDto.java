@@ -16,7 +16,7 @@ public class LogErrorDto {
     private String containerId;
     private String containerName;
     private String projectName;
-    private String exception;
+    private String category;
     private String stackTrace;
 
 

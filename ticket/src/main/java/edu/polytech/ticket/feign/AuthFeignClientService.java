@@ -1,5 +1,7 @@
 package edu.polytech.ticket.feign;
 
+import edu.polytech.ticket.dto.ProjectDto;
+import edu.polytech.ticket.dto.UserDto;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,12 +12,17 @@ public class AuthFeignClientService {
         this.authFeignClient = authFeignClient;
     }
 
-    /*public Boolean validateToken(String token) {
-        String authorizationHeader = "Bearer " + token;
-        Boolean response = authFeignClient.validateToken(authorizationHeader);
-        System.out.println("Réponse du Feign Client: " + response);
-        return response;
-    }*/
+    public ProjectDto getProjectByTitle(String title) {
+        return authFeignClient.getProjectByTitle(title);
+    }
+
+
+    public Integer extractUserIdFromToken(String token) {
+        return authFeignClient.getCurrentUser(token).getId();
+    }
+
+
+
 
 
 

@@ -26,7 +26,7 @@ public class TicketEntity {
     private String date;
     private String projectName;
     private String loggerName;
-    private String type;
+    private String category;
     @Column(name = "project_id")
     private Integer projectId;
 

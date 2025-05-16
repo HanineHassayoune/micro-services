@@ -4,6 +4,7 @@ import edu.polytech.ticket.dto.LogTicketDto;
 import edu.polytech.ticket.dto.ProjectDto;
 import edu.polytech.ticket.entity.TicketEntity;
 import edu.polytech.ticket.feign.AuthFeignClient;
+import edu.polytech.ticket.feign.AuthFeignClientService;
 import edu.polytech.ticket.kafka.TicketProducer;
 import edu.polytech.ticket.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.Optional;
 public class TicketService {
     private final TicketRepository repository;
     private final TicketProducer ticketProducer;
-    private final AuthFeignClient authFeignClient;
+    private final AuthFeignClientService authFeignClientService;
 
 
 /*public void saveTicket(TicketEntity ticket) {
@@ -28,7 +29,7 @@ public class TicketService {
 
     public void saveTicket(TicketEntity ticket) {
         try {
-            ProjectDto project = authFeignClient.getProjectByTitle(ticket.getProjectName());
+            ProjectDto project = authFeignClientService.getProjectByTitle(ticket.getProjectName());
             if (project != null && project.getId() != null) {
                 ticket.setProjectId(project.getId()); // Lier par ID
                 repository.save(ticket);
@@ -69,11 +70,16 @@ public class TicketService {
                 .date(entity.getDate())
                 .projectName(entity.getProjectName())
                 .loggerName(entity.getLoggerName())
-                .type(entity.getType())
+                .category(entity.getCategory())
                 .projectId(entity.getProjectId())
                 .stackTrace(entity.getStackTrace())
                 .assignedUserId(entity.getAssignedUserId())
                 .build();
+    }
+
+
+    public List<TicketEntity> getTicketsByProjectIdAndUserId(Long projectId, Integer userId) {
+        return repository.findByProjectIdAndAssignedUserId(projectId, userId);
     }
 
 

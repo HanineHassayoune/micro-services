@@ -22,7 +22,7 @@ public class LogService {
                 .timestamp(dto.getTimestamp())
                 .containerId(dto.getContainerId())
                 .containerName(dto.getContainerName())
-                .exception(dto.getException())
+                .category(dto.getCategory())
                 .stackTrace(dto.getStackTrace())
                 .projectName(dto.getProjectName())
                 .build();

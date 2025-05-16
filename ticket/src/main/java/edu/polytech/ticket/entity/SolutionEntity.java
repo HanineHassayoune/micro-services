@@ -2,7 +2,9 @@ package edu.polytech.ticket.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -14,7 +16,7 @@ import java.util.UUID;
 public class SolutionEntity {
     @Id
     @GeneratedValue
-    private UUID uuid;
+    private Integer id;
 
     private String description;
 
@@ -30,5 +32,8 @@ public class SolutionEntity {
     @Column(name = "created_by_user_id")
     private Integer createdByUserId;
 
+    @CreationTimestamp
+    @Column(name = "date_posted")
+    private LocalDateTime datePosted;
 
 }

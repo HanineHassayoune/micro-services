@@ -23,7 +23,7 @@ public class LogError {
     private String containerId;
     private String containerName;
     private String projectName;
-    private String exception;
+    private String category;
     @Column(columnDefinition = "TEXT")
     private String stackTrace;
 

@@ -20,7 +20,7 @@ public class LogTicketDto {
     private String date;
     private String projectName;
     private String loggerName;
-    private String type;
+    private String category;
     private Integer projectId;
     private String stackTrace;
     private Integer assignedUserId;

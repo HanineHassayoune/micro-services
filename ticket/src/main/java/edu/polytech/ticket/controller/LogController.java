@@ -45,7 +45,7 @@ public class LogController {
                     .timestamp((String) logMap.get("@timestamp"))
                     .containerId((String) logMap.get("container_id"))
                     .containerName((String) logMap.get("container_name"))
-                    .exception((String) logMap.get("exception"))
+                    .category((String) logMap.get("category"))
                     .stackTrace((String) logMap.get("stack_trace"))
                     .projectName((String) logMap.get("projectName"))
                     .build();

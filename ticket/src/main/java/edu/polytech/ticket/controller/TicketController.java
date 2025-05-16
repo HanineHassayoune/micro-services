@@ -47,7 +47,7 @@ public class TicketController {
                         .projectName((String) logMap.get("projectName"))
                         .loggerName((String) logMap.get("logger_name"))
                         .stackTrace((String) logMap.get("stack_trace"))
-                        .type((String) logMap.get("exception"))
+                        .category((String) logMap.get("category"))
                         .build();
 
                 TicketEntity ticket = TicketEntity.builder()
@@ -59,7 +59,7 @@ public class TicketController {
                         .projectName(dto.getProjectName())
                         .loggerName(dto.getLoggerName())
                         .stackTrace(dto.getStackTrace())
-                        .type(dto.getType())
+                        .category(dto.getCategory())
                         .build();
 
                 ticketService.saveTicket(ticket);
@@ -99,11 +99,25 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.toDto(ticket));
     }
 
-    @GetMapping("/assigned/{userId}")
-    public ResponseEntity<List<TicketEntity>> getAssignedTickets(@PathVariable Integer userId) {
-        List<TicketEntity> tickets = ticketRepository.findByAssignedUserId(userId);
-        return ResponseEntity.ok(tickets);
+
+    @GetMapping("/project/{projectId}/me")
+    public ResponseEntity<List<LogTicketDto>> getMyTicketsByProject(
+            @PathVariable Long projectId,
+            @RequestHeader("Authorization") String token
+    ) {
+        Integer userId = authFeignClientService.extractUserIdFromToken(token);
+
+        List<TicketEntity> tickets = ticketService.getTicketsByProjectIdAndUserId(projectId, userId);
+        List<LogTicketDto> dtos = tickets.stream()
+                .map(ticketService::toDto)
+                .toList();
+
+        return ResponseEntity.ok(dtos);
     }
+
+
+
+
 
 }
 
