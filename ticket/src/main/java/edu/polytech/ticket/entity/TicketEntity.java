@@ -1,6 +1,8 @@
 package edu.polytech.ticket.entity;
 
 
+import edu.polytech.ticket.enums.Priority;
+import edu.polytech.ticket.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;

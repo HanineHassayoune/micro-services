@@ -1,4 +1,4 @@
-package edu.polytech.ticket.entity;
+package edu.polytech.notification.enums;
 
 public enum Status {
     TO_DO,

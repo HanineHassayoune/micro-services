@@ -1,8 +1,8 @@
 package edu.polytech.ticket.dto;
 
 
-import edu.polytech.ticket.entity.Priority;
-import edu.polytech.ticket.entity.Status;
+import edu.polytech.ticket.enums.Priority;
+import edu.polytech.ticket.enums.Status;
 import lombok.*;
 
 @Getter
@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LogTicketDto {
+public class TicketDto {
     private Integer id;
     private Status status;
     private String title;

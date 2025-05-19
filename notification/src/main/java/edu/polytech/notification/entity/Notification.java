@@ -17,11 +17,9 @@ import java.util.UUID;
 public class Notification {
     @Id
     @GeneratedValue
-    private UUID uuid;
+    private Integer id;
     private String title;
-    private String description;
-    private Boolean isRead;
-
-
+    private String message;
+    private Integer ticketId;
 }
 

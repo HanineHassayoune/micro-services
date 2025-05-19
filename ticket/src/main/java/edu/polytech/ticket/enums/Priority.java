@@ -1,4 +1,4 @@
-package edu.polytech.ticket.entity;
+package edu.polytech.ticket.enums;
 
 public enum Priority {
     LOW,

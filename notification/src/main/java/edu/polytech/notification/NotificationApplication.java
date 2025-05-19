@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class NotificationApplication {
 
     public static void main(String[] args) {
+        System.out.println("Notification service is starting...");
         SpringApplication.run(NotificationApplication.class, args);
     }
 

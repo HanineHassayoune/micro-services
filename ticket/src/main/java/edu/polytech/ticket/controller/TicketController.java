@@ -1,15 +1,14 @@
 package edu.polytech.ticket.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.polytech.ticket.dto.LogTicketDto;
-import edu.polytech.ticket.entity.Priority;
-import edu.polytech.ticket.entity.Status;
+import edu.polytech.ticket.dto.TicketDto;
+import edu.polytech.ticket.enums.Priority;
+import edu.polytech.ticket.enums.Status;
 import edu.polytech.ticket.entity.TicketEntity;
 import edu.polytech.ticket.feign.AuthFeignClientService;
 import edu.polytech.ticket.repository.TicketRepository;
 import edu.polytech.ticket.service.TicketService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +37,7 @@ public class TicketController {
 
                 Map<String, Object> logMap = mapper.readValue(line, Map.class);
 
-                LogTicketDto dto = LogTicketDto.builder()
+                TicketDto dto = TicketDto.builder()
                         .status(Status.PENDING)
                         .title((String) logMap.get("message"))
                         .priority(Priority.LOW)
@@ -72,22 +71,22 @@ public class TicketController {
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<LogTicketDto>> getTicketsByProjectId(@PathVariable Long projectId) {
-        List<LogTicketDto> dtos = ticketService.getTicketsByProjectId(projectId).stream()
+    public ResponseEntity<List<TicketDto>> getTicketsByProjectId(@PathVariable Long projectId) {
+        List<TicketDto> dtos = ticketService.getTicketsByProjectId(projectId).stream()
                 .map(ticketService::toDto)
                 .toList();
         return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{ticketId}")
-    public ResponseEntity<LogTicketDto> getTicketById(@PathVariable Integer ticketId) {
+    public ResponseEntity<TicketDto> getTicketById(@PathVariable Integer ticketId) {
         TicketEntity ticket = ticketService.findTicketById(ticketId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found with ID: " + ticketId));
         return ResponseEntity.ok(ticketService.toDto(ticket));
     }
 
     @PutMapping("/{ticketId}/assign")
-    public ResponseEntity<LogTicketDto> assignUserToTicket(
+    public ResponseEntity<TicketDto> assignUserToTicket(
             @PathVariable Integer ticketId,
             @RequestParam Integer userId
     ) {
@@ -101,20 +100,29 @@ public class TicketController {
 
 
     @GetMapping("/project/{projectId}/me")
-    public ResponseEntity<List<LogTicketDto>> getMyTicketsByProject(
+    public ResponseEntity<List<TicketDto>> getMyTicketsByProject(
             @PathVariable Long projectId,
             @RequestHeader("Authorization") String token
     ) {
         Integer userId = authFeignClientService.extractUserIdFromToken(token);
 
         List<TicketEntity> tickets = ticketService.getTicketsByProjectIdAndUserId(projectId, userId);
-        List<LogTicketDto> dtos = tickets.stream()
+        List<TicketDto> dtos = tickets.stream()
                 .map(ticketService::toDto)
                 .toList();
 
         return ResponseEntity.ok(dtos);
     }
 
+
+    @PutMapping("/{ticketId}/status")
+    public ResponseEntity<TicketDto> updateTicketStatus(
+            @PathVariable Integer ticketId,
+            @RequestParam("status") Status status
+    ) {
+        TicketDto updated = ticketService.updateTicketStatus(ticketId, status);
+        return ResponseEntity.ok(updated);
+    }
 
 
 
