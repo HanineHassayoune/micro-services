@@ -4,6 +4,7 @@ import edu.polytech.ticket.dto.TicketDto;
 import edu.polytech.ticket.dto.ProjectDto;
 import edu.polytech.ticket.dto.UserDto;
 import edu.polytech.ticket.entity.TicketEntity;
+import edu.polytech.ticket.enums.Priority;
 import edu.polytech.ticket.enums.Status;
 import edu.polytech.ticket.feign.AuthFeignClientService;
 import edu.polytech.ticket.kafka.TicketProducer;
@@ -104,12 +105,17 @@ public class TicketService {
 
         ticket.setStatus(newStatus);
         TicketEntity saved = repository.save(ticket);
-
-        // Optionnel : renvoyer le ticket modifié sous forme de DTO
         return toDto(saved);
     }
 
 
+    public TicketDto updateTicketPriority(Integer ticketId, Priority newPriority) {
+        TicketEntity ticket = repository.findById(ticketId)
+                .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + ticketId));
 
+        ticket.setPriority(newPriority);
+        TicketEntity saved = repository.save(ticket);
+        return toDto(saved);
+    }
 
 }

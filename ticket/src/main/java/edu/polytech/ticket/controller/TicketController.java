@@ -151,8 +151,13 @@ public class TicketController {
         return ResponseEntity.ok(updated);
     }
 
-
-
-
+    @PutMapping("/{ticketId}/priority")
+    public ResponseEntity<TicketDto> updateTicketPriority(
+            @PathVariable Integer ticketId,
+            @RequestParam("priority") Priority priority
+    ) {
+        TicketDto updated = ticketService.updateTicketPriority(ticketId, priority);
+        return ResponseEntity.ok(updated);
+    }
 }
 
