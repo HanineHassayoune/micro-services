@@ -37,7 +37,8 @@ public interface AuthFeignClient {
     @GetMapping("/api/v1/auth/me")
     UserDto getCurrentUser(@RequestHeader("Authorization") String authorizationHeader);
 
-
+    @GetMapping("/api/users/{userId}")
+    UserDto getUserById(@PathVariable("userId") Integer userId);
 
 }
 

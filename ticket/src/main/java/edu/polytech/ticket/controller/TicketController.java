@@ -3,6 +3,7 @@ package edu.polytech.ticket.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.polytech.ticket.dto.TicketDto;
 import edu.polytech.ticket.enums.Priority;
+import edu.polytech.ticket.enums.Role;
 import edu.polytech.ticket.enums.Status;
 import edu.polytech.ticket.entity.TicketEntity;
 import edu.polytech.ticket.feign.AuthFeignClientService;
@@ -38,7 +39,7 @@ public class TicketController {
                 Map<String, Object> logMap = mapper.readValue(line, Map.class);
 
                 TicketDto dto = TicketDto.builder()
-                        .status(Status.PENDING)
+                        .status(Status.TO_DO)
                         .title((String) logMap.get("message"))
                         .priority(Priority.LOW)
                         .level((String) logMap.get("level"))
@@ -71,7 +72,7 @@ public class TicketController {
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<TicketDto>> getTicketsByProjectId(@PathVariable Long projectId) {
+    public ResponseEntity<List<TicketDto>> getTicketsByProjectId(@PathVariable Integer projectId) {
         List<TicketDto> dtos = ticketService.getTicketsByProjectId(projectId).stream()
                 .map(ticketService::toDto)
                 .toList();
@@ -99,20 +100,46 @@ public class TicketController {
     }
 
 
-    @GetMapping("/project/{projectId}/me")
+   /* @GetMapping("/project/{projectId}/me")
     public ResponseEntity<List<TicketDto>> getMyTicketsByProject(
-            @PathVariable Long projectId,
+            @PathVariable Integer projectId,
             @RequestHeader("Authorization") String token
     ) {
         Integer userId = authFeignClientService.extractUserIdFromToken(token);
+        Role role = authFeignClientService.extractUserRoleFromToken(token);
+
+        if (!Role.DEVELOPER.equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 403 Access Denied
+        }
 
         List<TicketEntity> tickets = ticketService.getTicketsByProjectIdAndUserId(projectId, userId);
+
         List<TicketDto> dtos = tickets.stream()
                 .map(ticketService::toDto)
                 .toList();
 
         return ResponseEntity.ok(dtos);
     }
+
+*/
+   @GetMapping("/project/{projectId}/filter")
+   public ResponseEntity<List<TicketDto>> filterTicketsByCategoryAndUser(
+           @PathVariable Integer projectId,
+           @RequestParam(required = false) String category,
+           @RequestParam(required = false) String assignedUserName
+   ) {
+       List<TicketDto> result = ticketService
+               .filterTickets(projectId, category, assignedUserName)
+               .stream()
+               .map(ticketService::toDto)
+               .toList();
+
+       return ResponseEntity.ok(result);
+   }
+
+
+
+
 
 
     @PutMapping("/{ticketId}/status")

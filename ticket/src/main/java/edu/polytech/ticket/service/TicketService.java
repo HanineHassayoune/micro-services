@@ -2,6 +2,7 @@ package edu.polytech.ticket.service;
 
 import edu.polytech.ticket.dto.TicketDto;
 import edu.polytech.ticket.dto.ProjectDto;
+import edu.polytech.ticket.dto.UserDto;
 import edu.polytech.ticket.entity.TicketEntity;
 import edu.polytech.ticket.enums.Status;
 import edu.polytech.ticket.feign.AuthFeignClientService;
@@ -21,12 +22,6 @@ public class TicketService {
     private final AuthFeignClientService authFeignClientService;
 
 
-/*public void saveTicket(TicketEntity ticket) {
-        repository.save(ticket);
-        ticketProducer.sendTicket(ticket);
-        System.out.println("Ticket enregistré et envoyé à Kafka : " + ticket.getTitle());
-    }*/
-
     public void saveTicket(TicketEntity ticket) {
         try {
             ProjectDto project = authFeignClientService.getProjectByTitle(ticket.getProjectName());
@@ -45,12 +40,7 @@ public class TicketService {
     }
 
 
-    public List<TicketEntity> findAllTickets() {
-        return repository.findAll();
-    }
-
-
-    public List<TicketEntity> getTicketsByProjectId(Long projectId) {
+    public List<TicketEntity> getTicketsByProjectId(Integer projectId) {
         return repository.findByProjectId(projectId);
     }
 
@@ -80,9 +70,32 @@ public class TicketService {
     }
 
 
-    public List<TicketEntity> getTicketsByProjectIdAndUserId(Long projectId, Integer userId) {
+    /*public List<TicketEntity> getTicketsByProjectIdAndUserId(Integer projectId, Integer userId) {
         return repository.findByProjectIdAndAssignedUserId(projectId, userId);
+    }*/
+
+    public List<TicketEntity> filterTickets(Integer projectId, String category, String assignedUserName) {
+        List<TicketEntity> tickets = repository.findByProjectId(projectId);
+
+        return tickets.stream()
+                .filter(ticket -> category == null || category.equalsIgnoreCase(ticket.getCategory()))
+                .filter(ticket -> {
+                    if (assignedUserName == null) return true;
+
+                    Integer assignedId = ticket.getAssignedUserId();
+                    if (assignedId == null) return false;
+
+                    try {
+                        UserDto user = authFeignClientService.getUserById(assignedId);
+                        String name = user.getName();
+                        return name.equalsIgnoreCase(assignedUserName);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .toList();
     }
+
 
 
     public TicketDto updateTicketStatus(Integer ticketId, Status newStatus) {

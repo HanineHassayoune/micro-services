@@ -2,6 +2,7 @@ package edu.polytech.ticket.feign;
 
 import edu.polytech.ticket.dto.ProjectDto;
 import edu.polytech.ticket.dto.UserDto;
+import edu.polytech.ticket.enums.Role;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +20,10 @@ public class AuthFeignClientService {
 
     public Integer extractUserIdFromToken(String token) {
         return authFeignClient.getCurrentUser(token).getId();
+    }
+
+    public UserDto getUserById(Integer userId) {
+        return authFeignClient.getUserById(userId);
     }
 
 
