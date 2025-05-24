@@ -11,6 +11,7 @@ public interface TicketRepository extends JpaRepository<TicketEntity, Integer> {
 
     List<TicketEntity> findByProjectIdAndAssignedUserId(Integer projectId, Integer assignedUserId);
 
+    List<TicketEntity> findByCategory(String category);
 
 
 }

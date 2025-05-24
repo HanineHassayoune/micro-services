@@ -118,4 +118,9 @@ public class TicketService {
         return toDto(saved);
     }
 
+
+    public List<TicketEntity> findTicketsByCategory(String category) {
+        return repository.findByCategory(category);
+    }
+
 }

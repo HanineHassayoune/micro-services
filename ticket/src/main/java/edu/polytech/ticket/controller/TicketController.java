@@ -159,5 +159,22 @@ public class TicketController {
         TicketDto updated = ticketService.updateTicketPriority(ticketId, priority);
         return ResponseEntity.ok(updated);
     }
+
+
+    @GetMapping("/{ticketId}/related")
+    public ResponseEntity<List<TicketDto>> getTicketsWithSameCategory(@PathVariable Integer ticketId) {
+        TicketEntity currentTicket = ticketService.findTicketById(ticketId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
+
+        String category = currentTicket.getCategory();
+
+        List<TicketDto> relatedTickets = ticketService.findTicketsByCategory(category).stream()
+                .filter(ticket -> !ticket.getId().equals(ticketId)) // Exclure le ticket lui-même
+                .map(ticketService::toDto)
+                .toList();
+
+        return ResponseEntity.ok(relatedTickets);
+    }
+
 }
 
