@@ -9,36 +9,27 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 
 
-/*@FeignClient(name = "authentications")
-public interface AuthFeignClient {
-    @GetMapping("/api/v1/auth/validate-token")
-    Boolean validateToken(@RequestHeader("Authorization") String authorizationHeader);
-
-
-    @GetMapping("/api/v1/projects/title/{title}")
-    ProjectDto getProjectByTitle(@PathVariable("title") String title);
-
-
-}*/
-
-
 @FeignClient(name = "authentications")
 public interface AuthFeignClient {
 
     @GetMapping("/api/v1/projects/title/{title}")
     ProjectDto getProjectByTitle(@PathVariable String title);
 
-
     @GetMapping("/api/v1/auth/validate-token")
     Boolean validateToken(@RequestHeader("Authorization") String authorizationHeader);
-
-
 
     @GetMapping("/api/v1/auth/me")
     UserDto getCurrentUser(@RequestHeader("Authorization") String authorizationHeader);
 
     @GetMapping("/api/users/{userId}")
     UserDto getUserById(@PathVariable("userId") Integer userId);
+
+    @GetMapping("/api/v1/projects/{id}")
+    ProjectDto getProjectById(@PathVariable Integer id);
+
+
+
+
 
 }
 

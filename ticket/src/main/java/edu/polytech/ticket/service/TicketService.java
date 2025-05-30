@@ -4,14 +4,19 @@ import edu.polytech.ticket.dto.TicketDto;
 import edu.polytech.ticket.dto.ProjectDto;
 import edu.polytech.ticket.dto.UserDto;
 import edu.polytech.ticket.entity.TicketEntity;
+import edu.polytech.ticket.enums.Architecture;
 import edu.polytech.ticket.enums.Priority;
 import edu.polytech.ticket.enums.Status;
 import edu.polytech.ticket.feign.AuthFeignClientService;
 import edu.polytech.ticket.kafka.TicketProducer;
 import edu.polytech.ticket.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,10 +46,43 @@ public class TicketService {
     }
 
 
-    public List<TicketEntity> getTicketsByProjectId(Integer projectId) {
+   /*public List<TicketEntity> getTicketsByProjectId(Integer projectId) {
         return repository.findByProjectId(projectId);
+    }*/
+
+
+    public List<TicketEntity> getTicketsByProjectSmart(Integer projectId) {
+        // Fetch project details
+        ProjectDto project = authFeignClientService.getProjectById(projectId);
+        if (project == null || project.getId() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with ID: " + projectId);
+        }
+
+        // Check architecture and fetch tickets accordingly
+        List<Integer> projectIds;
+        if (project.getArchitecture() == Architecture.MICROSERVICES) {
+            projectIds = getAllProjectIdsRecursively(project);
+        } else {
+            projectIds = Collections.singletonList(project.getId());
+        }
+
+        return repository.findAllByProjectIdIn(projectIds);
     }
 
+    private List<Integer> getAllProjectIdsRecursively(ProjectDto project) {
+        List<Integer> ids = new ArrayList<>();
+        if (project == null || project.getId() == null) {
+            return ids;
+        }
+        ids.add(project.getId());
+        List<ProjectDto> children = project.getMicroservices();
+        if (children != null) {
+            for (ProjectDto child : children) {
+                ids.addAll(getAllProjectIdsRecursively(child));
+            }
+        }
+        return ids;
+    }
 
 
     public Optional<TicketEntity> findTicketById(Integer id) {

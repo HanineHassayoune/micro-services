@@ -73,11 +73,12 @@ public class TicketController {
 
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<TicketDto>> getTicketsByProjectId(@PathVariable Integer projectId) {
-        List<TicketDto> dtos = ticketService.getTicketsByProjectId(projectId).stream()
+        List<TicketDto> dtos = ticketService.getTicketsByProjectSmart(projectId).stream()
                 .map(ticketService::toDto)
                 .toList();
         return ResponseEntity.ok(dtos);
     }
+
 
     @GetMapping("/{ticketId}")
     public ResponseEntity<TicketDto> getTicketById(@PathVariable Integer ticketId) {
@@ -136,11 +137,6 @@ public class TicketController {
 
        return ResponseEntity.ok(result);
    }
-
-
-
-
-
 
     @PutMapping("/{ticketId}/status")
     public ResponseEntity<TicketDto> updateTicketStatus(
