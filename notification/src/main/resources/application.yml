@@ -29,13 +29,14 @@ spring:
     consumer:
       group-id: notification-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       auto-offset-reset: earliest
       properties:
         spring:
           json:
             trusted:
               packages: '*'
+
     template:
       default-topic: ticket-topic
     admin:

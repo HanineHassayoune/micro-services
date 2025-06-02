@@ -1,38 +1,20 @@
 package edu.polytech.ticket.kafka;
 
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.polytech.ticket.dto.TicketDto;
 import edu.polytech.ticket.entity.TicketEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
-import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.EnableKafka;
 
-/*@Service
-@EnableKafka
-public class TicketProducer {
-
-    private final KafkaTemplate<String, TicketEntity> kafkaTemplate;
-
-    public TicketProducer(KafkaTemplate<String, TicketEntity> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
-
-    public void sendTicket(TicketEntity ticket) {
-        // Envoi du message (ticket) sur le topic Kafka
-        kafkaTemplate.send("ticket-topic", ticket);
-    }
-}*/
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class TicketProducer {
 
-    private final KafkaTemplate<String, TicketDto> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final ObjectMapper objectMapper;
 
     public void sendTicket(TicketEntity ticket) {
         TicketDto ticketDto = TicketDto.builder()
@@ -44,8 +26,12 @@ public class TicketProducer {
                 .category(ticket.getCategory())
                 .assignedUserId(ticket.getAssignedUserId())
                 .build();
-        kafkaTemplate.send("ticket-topic", ticketDto);
-        log.info("📦 Ticket publié dans Kafka : {}", ticketDto.getTitle());
+        try {
+            String json = objectMapper.writeValueAsString(ticketDto);
+            kafkaTemplate.send("ticket-topic", json);
+            log.info("📦 Ticket JSON publié dans Kafka : {}", json);
+        } catch (Exception e) {
+            log.error("❌ Erreur de sérialisation du ticket : {}", e.getMessage());
+        }
     }
-
 }
