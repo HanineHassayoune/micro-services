@@ -6,6 +6,7 @@ import edu.polytech.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 public class NotificationController {
 
     private final NotificationService service;
-
+    private final SimpMessagingTemplate simpMessagingTemplate;
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void save(@RequestBody Notification notification){
@@ -28,5 +29,9 @@ public class NotificationController {
     public ResponseEntity<List<Notification>> findAllNotifications(){
         return ResponseEntity.ok(service.findAllNotifications());
     }
+
+
+
+
 
 }
