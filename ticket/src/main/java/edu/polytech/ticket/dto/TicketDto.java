@@ -24,6 +24,7 @@ public class TicketDto {
     private Integer projectId;
     private String stackTrace;
     private Integer assignedUserId;
+    private Integer managerId;
 
 
 }

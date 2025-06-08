@@ -21,6 +21,8 @@ public class Notification {
     private String title;
     private String message;
     private Integer ticketId;
+    private Integer receiverId;
+
 
 }
 

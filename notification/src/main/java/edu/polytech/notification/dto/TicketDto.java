@@ -11,17 +11,9 @@ import lombok.*;
 @Builder
 public class TicketDto {
     private Integer id;
-   // private Status status;
     private String title;
-  //  private Priority priority;
-   // private String imageUrl;
-  //  private String level;
-  //  private String date;
    private String projectName;
-  //  private String loggerName;
-   // private String category;
-  //  private Integer projectId;
-  //  private String stackTrace;
-   // private Integer assignedUserId;
+   private Integer projectId;
+    private Integer managerId;
 
 }

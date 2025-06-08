@@ -20,7 +20,6 @@ public class TicketEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
     private String title;
-    //private String description; // tasks: Array
     @Enumerated(EnumType.STRING)
     private Priority priority;
     private String imageUrl;
@@ -43,10 +42,6 @@ public class TicketEntity {
     @Column(name = "assigned_user_id")
     private Integer assignedUserId;
 
-
-    //@ManyToOne
-    //@JoinColumn(name = "project_id")
-    //private Project project;
 
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentEntity> comments;

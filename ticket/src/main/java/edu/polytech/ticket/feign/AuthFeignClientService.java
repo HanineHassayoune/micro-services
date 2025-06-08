@@ -16,7 +16,7 @@ public class AuthFeignClientService {
         return authFeignClient.getProjectByTitle(title);
     }
 
-    public Integer extractUserIdFromToken(String token) {
+   public Integer extractUserIdFromToken(String token) {
         return authFeignClient.getCurrentUser(token).getId();
     }
 
@@ -26,6 +26,10 @@ public class AuthFeignClientService {
 
     public ProjectDto getProjectById(Integer id) {
         return authFeignClient.getProjectById(id);
+    }
+
+    public UserDto getManagerByProject(String projectTitle) {
+        return authFeignClient.getManagerByProject(projectTitle);
     }
 
 

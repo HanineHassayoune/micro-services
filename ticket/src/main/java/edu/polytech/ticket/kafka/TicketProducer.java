@@ -16,7 +16,7 @@ public class TicketProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    public void sendTicket(TicketEntity ticket) {
+    public void sendTicket(TicketEntity ticket, Integer managerId) {
         TicketDto ticketDto = TicketDto.builder()
                 .id(ticket.getId())
                 .title(ticket.getTitle())
@@ -24,6 +24,7 @@ public class TicketProducer {
                 .priority(ticket.getPriority())
                 .date(ticket.getDate())
                 .category(ticket.getCategory())
+                .managerId(managerId)
                 .assignedUserId(ticket.getAssignedUserId())
                 .build();
         try {

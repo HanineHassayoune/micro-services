@@ -6,6 +6,7 @@ import edu.polytech.ticket.dto.UserDto;
 import edu.polytech.ticket.entity.TicketEntity;
 import edu.polytech.ticket.enums.Architecture;
 import edu.polytech.ticket.enums.Priority;
+import edu.polytech.ticket.enums.Role;
 import edu.polytech.ticket.enums.Status;
 import edu.polytech.ticket.feign.AuthFeignClientService;
 import edu.polytech.ticket.kafka.TicketProducer;
@@ -32,10 +33,13 @@ public class TicketService {
         try {
             ProjectDto project = authFeignClientService.getProjectByTitle(ticket.getProjectName());
             if (project != null && project.getId() != null) {
-                ticket.setProjectId(project.getId()); // Lier par ID
+                ticket.setProjectId(project.getId());
                 repository.save(ticket);
-                System.out.println("📤 Envoi du ticket à Kafka...");
-                ticketProducer.sendTicket(ticket);
+
+                // 👉 Récupération du manager et envoi avec managerId
+                UserDto manager = authFeignClientService.getManagerByProject(ticket.getProjectName());
+                System.out.println("📤 Envoi du ticket à Kafka avec managerId=" + manager.getId());
+                ticketProducer.sendTicket(ticket, manager.getId()); // ✅ Appel corrigé
             } else {
                 System.err.println("⚠️ Projet trouvé mais ID nul : " + ticket.getProjectName());
             }
@@ -44,12 +48,6 @@ public class TicketService {
             e.printStackTrace();
         }
     }
-
-
-   /*public List<TicketEntity> getTicketsByProjectId(Integer projectId) {
-        return repository.findByProjectId(projectId);
-    }*/
-
 
     public List<TicketEntity> getTicketsByProjectSmart(Integer projectId) {
         // Fetch project details
@@ -107,11 +105,6 @@ public class TicketService {
                 .assignedUserId(entity.getAssignedUserId())
                 .build();
     }
-
-
-    /*public List<TicketEntity> getTicketsByProjectIdAndUserId(Integer projectId, Integer userId) {
-        return repository.findByProjectIdAndAssignedUserId(projectId, userId);
-    }*/
 
     public List<TicketEntity> filterTickets(Integer projectId, String category, String assignedUserName) {
         List<TicketEntity> tickets = repository.findByProjectId(projectId);

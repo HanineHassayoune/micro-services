@@ -22,4 +22,12 @@ public class NotificationService {
     public List<Notification>findAllNotifications(){
         return repository.findAll();
     }
+    public List<Notification> findNotificationsByReceiver(Integer receiverId) {
+        return repository.findByReceiverId(receiverId);
+    }
+
+
+
 }
+
+
