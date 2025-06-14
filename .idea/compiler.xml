@@ -11,8 +11,9 @@
         <module name="notification" />
         <module name="security" />
         <module name="ticket" />
-        <module name="gateway" />
         <module name="discovery" />
+        <module name="gateway" />
+        <module name="statistics" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -27,6 +28,7 @@
       <module name="gateway" options="-parameters" />
       <module name="notification" options="-parameters" />
       <module name="security" options="-parameters" />
+      <module name="statistics" options="-parameters" />
       <module name="ticket" options="-parameters" />
     </option>
   </component>

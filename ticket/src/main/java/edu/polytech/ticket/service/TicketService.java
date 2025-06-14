@@ -16,10 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -150,8 +148,31 @@ public class TicketService {
     }
 
 
-    public List<TicketEntity> findTicketsByCategory(String category) {
-        return repository.findByCategory(category);
+    public List<TicketEntity> findDoneTicketsByCategory(String category) {
+        return repository.findByCategoryAndStatus(category, Status.DONE);
     }
+
+    public Map<String, Long> countTicketsByStatus(Integer projectId) {
+        return repository.findByProjectId(projectId).stream()
+                .collect(Collectors.groupingBy(
+                        ticket -> ticket.getStatus().name(),
+                        Collectors.counting()
+                ));
+    }
+
+    public Map<String, Double> getTicketCategoriesPercentage(Integer projectId) {
+        List<TicketEntity> tickets = repository.findByProjectId(projectId);
+        long total = tickets.size();
+
+        if (total == 0) return Map.of();
+
+        return tickets.stream()
+                .collect(Collectors.groupingBy(
+                        TicketEntity::getCategory,
+                        Collectors.collectingAndThen(Collectors.counting(), count -> (count * 100.0) / total)
+                ));
+    }
+
+
 
 }

@@ -12,6 +12,7 @@
         <option value="$PROJECT_DIR$/ticket/pom.xml" />
         <option value="$PROJECT_DIR$/notification/pom.xml" />
         <option value="$PROJECT_DIR$/authentication/pom.xml" />
+        <option value="$PROJECT_DIR$/statistics/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

@@ -9,7 +9,8 @@ import java.util.List;
 public interface TicketRepository extends JpaRepository<TicketEntity, Integer> {
     List<TicketEntity> findByProjectId(Integer projectId);
 
-    List<TicketEntity> findByCategory(String category);
+    List<TicketEntity> findByCategoryAndStatus(String category, Status status);
+
 
     List<TicketEntity> findAllByProjectIdIn(List<Integer> projectIds);
 

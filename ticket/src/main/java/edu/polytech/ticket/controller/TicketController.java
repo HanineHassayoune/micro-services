@@ -164,13 +164,40 @@ public class TicketController {
 
         String category = currentTicket.getCategory();
 
-        List<TicketDto> relatedTickets = ticketService.findTicketsByCategory(category).stream()
+        List<TicketDto> relatedTickets = ticketService.findDoneTicketsByCategory(category).stream()
                 .filter(ticket -> !ticket.getId().equals(ticketId)) // Exclure le ticket lui-même
                 .map(ticketService::toDto)
                 .toList();
 
         return ResponseEntity.ok(relatedTickets);
     }
+
+
+    // Renvoyer tous les tickets d'un projet
+    @GetMapping("/by-project/{projectId}")
+    public ResponseEntity<List<TicketDto>> getTicketsByProject(@PathVariable Integer projectId) {
+        List<TicketDto> dtos = ticketService.getTicketsByProjectSmart(projectId)
+                .stream()
+                .map(ticketService::toDto)
+                .toList();
+        return ResponseEntity.ok(dtos);
+    }
+
+    // Renvoyer le nombre de tickets par statut pour un projet
+    @GetMapping("/statuses/{projectId}")
+    public ResponseEntity<Map<String, Long>> getTicketStatusesByProject(@PathVariable Integer projectId) {
+        Map<String, Long> result = ticketService.countTicketsByStatus(projectId);
+        return ResponseEntity.ok(result);
+    }
+
+    // Renvoyer le nombre de tickets par catégorie pour un projet
+    @GetMapping("/categories/percentages/{projectId}")
+    public ResponseEntity<Map<String, Double>> getTicketCategoriesPercentageByProject(@PathVariable Integer projectId) {
+        Map<String, Double> result = ticketService.getTicketCategoriesPercentage(projectId);
+        return ResponseEntity.ok(result);
+    }
+
+
 
 }
 
