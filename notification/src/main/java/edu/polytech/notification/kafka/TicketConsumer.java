@@ -45,6 +45,9 @@ public class TicketConsumer {
 
             // 2. Envoi via WebSocket au client ciblé
             messagingTemplate.convertAndSend("/topic/notifications", notification);
+            //messagingTemplate.convertAndSend("/user/" + ticket.getManagerId() + "/queue/notifications", notification);
+            //log.info("userrrrrrrrr:"+ticket.getManagerId());
+
 
         } catch (Exception e) {
             log.error("🚨 Erreur lors de la désérialisation ou traitement du ticket : {}", e.getMessage(), e);
