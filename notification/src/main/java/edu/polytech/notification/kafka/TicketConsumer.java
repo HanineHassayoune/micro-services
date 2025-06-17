@@ -44,7 +44,7 @@ public class TicketConsumer {
             notificationService.saveNotification(notification);
 
             // 2. Envoi via WebSocket au client ciblé
-            messagingTemplate.convertAndSend("/topic/notifications", notification);
+            messagingTemplate.convertAndSend("/topic/notifications"+"/"+ticket.getManagerId(), notification);
             //messagingTemplate.convertAndSendToUser(
                    // ticket.getManagerId().toString(), // identifiant unique du manager
                   //  "/queue/notifications",           // destination privée
