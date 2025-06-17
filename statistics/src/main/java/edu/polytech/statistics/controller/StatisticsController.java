@@ -38,5 +38,16 @@ public class StatisticsController {
         return authFeignClientService.getUserCountByProject(projectId);
     }
 
+    @GetMapping("/tickets/priorities/{projectId}")
+    public Map<String, Long> getTicketPrioritiesByProject(@PathVariable Integer projectId) {
+        return ticketFeignClientService.getTicketPrioritiesByProject(projectId);
+    }
+
+
+    @GetMapping("/tickets/count-category-priority/{projectId}")
+    public Map<String, Map<String, Long>> getCountTicketsByCategoryAndPriority(@PathVariable Integer projectId) {
+        return ticketFeignClientService.getTicketCountByCategoryAndPriority(projectId);
+    }
+
 
 }

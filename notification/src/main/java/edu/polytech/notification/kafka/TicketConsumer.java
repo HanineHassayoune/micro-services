@@ -45,8 +45,13 @@ public class TicketConsumer {
 
             // 2. Envoi via WebSocket au client ciblé
             messagingTemplate.convertAndSend("/topic/notifications", notification);
-            //messagingTemplate.convertAndSend("/user/" + ticket.getManagerId() + "/queue/notifications", notification);
-            //log.info("userrrrrrrrr:"+ticket.getManagerId());
+            //messagingTemplate.convertAndSendToUser(
+                   // ticket.getManagerId().toString(), // identifiant unique du manager
+                  //  "/queue/notifications",           // destination privée
+                 //   notification
+         // );
+
+
 
 
         } catch (Exception e) {

@@ -3,7 +3,6 @@ package edu.polytech.ticket.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.polytech.ticket.dto.TicketDto;
 import edu.polytech.ticket.enums.Priority;
-import edu.polytech.ticket.enums.Role;
 import edu.polytech.ticket.enums.Status;
 import edu.polytech.ticket.entity.TicketEntity;
 import edu.polytech.ticket.feign.AuthFeignClientService;
@@ -70,6 +69,33 @@ public class TicketController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Impossible de parser ou enregistrer le(s) ticket(s).");
         }
     }
+
+    @PostMapping("/manual")
+    public ResponseEntity<String> createManualTicket(@RequestBody TicketDto dto) {
+        try {
+            TicketEntity ticket = TicketEntity.builder()
+                    .status(dto.getStatus())
+                    .title(dto.getTitle())
+                    .priority(dto.getPriority())
+                    .level(dto.getLevel())
+                    .date(dto.getDate())
+                    .projectName(dto.getProjectName())
+                    .loggerName(dto.getLoggerName())
+                    .stackTrace(dto.getStackTrace())
+                    .category(dto.getCategory())
+                    .assignedUserId(dto.getAssignedUserId())
+                    .imageUrl(dto.getImageUrl())
+                    .build();
+
+            ticketService.saveTicket(ticket);
+            System.out.println("🎫 Ticket created manually !");
+            return ResponseEntity.status(HttpStatus.CREATED).body("✅ Ticket created successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("❌ Failed to create ticket.");
+        }
+    }
+
 
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<TicketDto>> getTicketsByProjectId(@PathVariable Integer projectId) {
@@ -198,6 +224,26 @@ public class TicketController {
     }
 
 
+    @GetMapping("/priorities/{projectId}")
+    public ResponseEntity<Map<String, Long>> getTicketPrioritiesByProject(@PathVariable Integer projectId) {
+        Map<String, Long> result = ticketService.countTicketsByPriority(projectId);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/project/{projectId}/category-priority")
+    public ResponseEntity<Map<String, Map<String, Long>>> getTicketsByCategoryAndPriority(
+            @PathVariable Integer projectId) {
+        Map<String, Map<String, Long>> result = ticketService.countTicketsByCategoryAndPriority(projectId);
+        return ResponseEntity.ok(result);
+    }
+
+
+    @GetMapping("/count-by-category-priority/{projectId}")
+    public ResponseEntity<Map<String, Map<String, Long>>> getCountByCategoryAndPriority(
+            @PathVariable Integer projectId) {
+        Map<String, Map<String, Long>> counts = ticketService.countTicketsByCategoryAndPriority(projectId);
+        return ResponseEntity.ok(counts);
+    }
 
 }
 

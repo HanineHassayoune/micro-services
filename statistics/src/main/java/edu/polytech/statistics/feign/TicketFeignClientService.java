@@ -26,4 +26,11 @@ public class TicketFeignClientService {
         return ticketFeignClient.getTicketCategoriesPercentageByProject(projectId);
     }
 
+    public Map<String, Long> getTicketPrioritiesByProject(Integer projectId) {
+        return ticketFeignClient.getTicketPrioritiesByProject(projectId);
+    }
+
+    public Map<String, Map<String, Long>> getTicketCountByCategoryAndPriority(Integer projectId) {
+        return ticketFeignClient.getTicketCountByCategoryAndPriority(projectId);
+    }
 }

@@ -22,6 +22,7 @@ public class TicketEntity {
     private String title;
     @Enumerated(EnumType.STRING)
     private Priority priority;
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
     private String level;
     private String date;

@@ -18,4 +18,11 @@ public interface TicketFeignClient {
 
     @GetMapping("/api/v1/tickets/categories/percentages/{projectId}")
     Map<String, Double> getTicketCategoriesPercentageByProject(@PathVariable Integer projectId);
+
+    @GetMapping("/api/v1/tickets/priorities/{projectId}")
+    Map<String, Long> getTicketPrioritiesByProject(@PathVariable Integer projectId);
+
+    @GetMapping("/api/v1/tickets/count-by-category-priority/{projectId}")
+    Map<String, Map<String, Long>> getTicketCountByCategoryAndPriority(@PathVariable Integer projectId);
+
 }

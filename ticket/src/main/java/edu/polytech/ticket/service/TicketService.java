@@ -6,7 +6,6 @@ import edu.polytech.ticket.dto.UserDto;
 import edu.polytech.ticket.entity.TicketEntity;
 import edu.polytech.ticket.enums.Architecture;
 import edu.polytech.ticket.enums.Priority;
-import edu.polytech.ticket.enums.Role;
 import edu.polytech.ticket.enums.Status;
 import edu.polytech.ticket.feign.AuthFeignClientService;
 import edu.polytech.ticket.kafka.TicketProducer;
@@ -173,6 +172,46 @@ public class TicketService {
                 ));
     }
 
+
+    public Map<String, Long> countTicketsByPriority(Integer projectId) {
+        List<TicketEntity> tickets = getTicketsByProjectSmart(projectId);
+
+        Map<String, Long> counts = tickets.stream()
+                .collect(Collectors.groupingBy(
+                        ticket -> ticket.getPriority().name(),
+                        Collectors.counting()
+                ));
+        // Assurer que toutes les priorités sont présentes
+        for (Priority priority : Priority.values()) {
+            counts.putIfAbsent(priority.name(), 0L);
+        }
+
+        return counts;
+    }
+
+    public Map<String, Map<String, Long>> countTicketsByCategoryAndPriority(Integer projectId) {
+        List<TicketEntity> tickets = repository.findByProjectId(projectId);
+
+        // Grouper par catégorie puis par priorité
+        Map<String, Map<String, Long>> result = tickets.stream()
+                .filter(ticket -> ticket.getCategory() != null && !ticket.getCategory().isBlank()) // exclure catégorie null ou vide
+                .collect(Collectors.groupingBy(
+                        TicketEntity::getCategory,
+                        Collectors.groupingBy(
+                                ticket -> ticket.getPriority().name(),
+                                Collectors.counting()
+                        )
+                ));
+        // Assurer que toutes les priorités existent pour chaque catégorie, même à 0
+        for (String category : result.keySet()) {
+            Map<String, Long> priorityMap = result.get(category);
+            for (Priority p : Priority.values()) {
+                priorityMap.putIfAbsent(p.name(), 0L);
+            }
+        }
+
+        return result;
+    }
 
 
 }
