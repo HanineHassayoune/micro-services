@@ -49,5 +49,11 @@ public class StatisticsController {
         return ticketFeignClientService.getTicketCountByCategoryAndPriority(projectId);
     }
 
+    @GetMapping("/tickets/count-per-day/{projectId}")
+    public Map<String, Long> countTicketsPerDay(@PathVariable Integer projectId) {
+        return ticketFeignClientService.countTicketsPerDay(projectId);
+    }
+
+
 
 }

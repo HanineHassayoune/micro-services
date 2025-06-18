@@ -122,33 +122,11 @@ public class TicketController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
 
         ticket.setAssignedUserId(userId);
-        ticketService.saveTicket(ticket);
+        ticketService.updateTicket(ticket);
         return ResponseEntity.ok(ticketService.toDto(ticket));
     }
 
 
-   /* @GetMapping("/project/{projectId}/me")
-    public ResponseEntity<List<TicketDto>> getMyTicketsByProject(
-            @PathVariable Integer projectId,
-            @RequestHeader("Authorization") String token
-    ) {
-        Integer userId = authFeignClientService.extractUserIdFromToken(token);
-        Role role = authFeignClientService.extractUserRoleFromToken(token);
-
-        if (!Role.DEVELOPER.equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 403 Access Denied
-        }
-
-        List<TicketEntity> tickets = ticketService.getTicketsByProjectIdAndUserId(projectId, userId);
-
-        List<TicketDto> dtos = tickets.stream()
-                .map(ticketService::toDto)
-                .toList();
-
-        return ResponseEntity.ok(dtos);
-    }
-
-*/
    @GetMapping("/project/{projectId}/filter")
    public ResponseEntity<List<TicketDto>> filterTicketsByCategoryAndUser(
            @PathVariable Integer projectId,
@@ -244,6 +222,15 @@ public class TicketController {
         Map<String, Map<String, Long>> counts = ticketService.countTicketsByCategoryAndPriority(projectId);
         return ResponseEntity.ok(counts);
     }
+
+
+    @GetMapping("/count-per-day")
+    public ResponseEntity<Map<String, Long>> countTicketsPerDayByProject(
+            @RequestParam Integer projectId) {
+        Map<String, Long> result = ticketService.countTicketsPerDayByProject(projectId);
+        return ResponseEntity.ok(result);
+    }
+
 
 }
 

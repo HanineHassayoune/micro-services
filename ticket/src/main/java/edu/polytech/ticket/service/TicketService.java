@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,6 +46,10 @@ public class TicketService {
             System.err.println("⚠️ Projet introuvable ou erreur lors de la récupération : " + ticket.getProjectName());
             e.printStackTrace();
         }
+    }
+
+    public void updateTicket(TicketEntity ticket) {
+        repository.save(ticket); //  save sans appel Kafka
     }
 
     public List<TicketEntity> getTicketsByProjectSmart(Integer projectId) {
@@ -211,6 +217,26 @@ public class TicketService {
         }
 
         return result;
+    }
+
+    public Map<String, Long> countTicketsPerDayByProject(Integer projectId) {
+        List<TicketEntity> tickets = repository.findByProjectId(projectId);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+
+        return tickets.stream()
+                .filter(t -> t.getDate() != null)
+                .collect(Collectors.groupingBy(
+                        t -> {
+                            try {
+                                OffsetDateTime odt = OffsetDateTime.parse(t.getDate(), formatter);
+                                return odt.toLocalDate().toString(); // format "2025-06-17"
+                            } catch (Exception e) {
+                                return "invalid-date";
+                            }
+                        },
+                        Collectors.counting()
+                ));
     }
 
 

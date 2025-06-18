@@ -33,4 +33,8 @@ public class TicketFeignClientService {
     public Map<String, Map<String, Long>> getTicketCountByCategoryAndPriority(Integer projectId) {
         return ticketFeignClient.getTicketCountByCategoryAndPriority(projectId);
     }
+    public Map<String, Long> countTicketsPerDay(Integer projectId) {
+        return ticketFeignClient.countTicketsPerDay(projectId);
+    }
+
 }
