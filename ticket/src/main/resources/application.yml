@@ -34,3 +34,5 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+github:
+  token : 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

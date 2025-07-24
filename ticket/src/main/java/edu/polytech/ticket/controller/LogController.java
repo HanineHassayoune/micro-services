@@ -16,22 +16,9 @@ import java.util.Map;
 public class LogController {
     private final LogService logService;
 
-   /* @PostMapping
-    public ResponseEntity<String> receiveLog() {
-        System.out.println("✅ RECEIVED LOG DATA");
-        return ResponseEntity.ok("Log received");
-    }*/
-
-    /*@PostMapping(consumes = {"application/json", "application/x-ndjson"})
-    public ResponseEntity<String> receiveLog(@RequestBody String rawLog) {
-        System.out.println("✅ RECEIVED NDJSON LOG: " + rawLog);
-        return ResponseEntity.ok("received");
-    }*/
-
-
     @PostMapping(consumes = {"application/json", "application/x-ndjson"})
     public ResponseEntity<String> receiveLog(@RequestBody String rawLog) {
-        System.out.println("✅ RECEIVED NDJSON LOG: " + rawLog);
+        System.out.println("RECEIVED NDJSON LOG: " + rawLog);
 
         try {
             ObjectMapper mapper = new ObjectMapper();

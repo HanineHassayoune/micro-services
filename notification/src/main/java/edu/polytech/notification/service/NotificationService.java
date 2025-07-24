@@ -15,7 +15,7 @@ public class NotificationService {
     private final NotificationRepository repository;
 
     public void saveNotification(Notification notification){
-        log.info("💾 Notification enregistrée : {}", notification.getTitle());
+        log.info("Notification enregistrée : {}", notification.getTitle());
         repository.save(notification);
     }
 

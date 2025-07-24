@@ -8,6 +8,7 @@ import edu.polytech.ticket.enums.Architecture;
 import edu.polytech.ticket.enums.Priority;
 import edu.polytech.ticket.enums.Status;
 import edu.polytech.ticket.feign.AuthFeignClientService;
+import edu.polytech.ticket.gitHub.GitHubService;
 import edu.polytech.ticket.kafka.TicketProducer;
 import edu.polytech.ticket.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,27 +27,42 @@ public class TicketService {
     private final TicketRepository repository;
     private final TicketProducer ticketProducer;
     private final AuthFeignClientService authFeignClientService;
-
+    private final GitHubService gitHubService;
 
     public void saveTicket(TicketEntity ticket) {
         try {
             ProjectDto project = authFeignClientService.getProjectByTitle(ticket.getProjectName());
+
             if (project != null && project.getId() != null) {
                 ticket.setProjectId(project.getId());
-                repository.save(ticket);
+                TicketEntity saved = repository.save(ticket); // on récupère l'objet sauvegardé
 
-                // 👉 Récupération du manager et envoi avec managerId
+                // Créer la branche GitHub liée au ticket
+                String branchName = "ticket_" + saved.getId();
+                try {
+                    gitHubService.createBranchForTicket(ticket.getProjectName(), branchName);
+                    // Mettre à jour le ticket avec le nom de la branche
+                    saved.setBranchName(branchName);
+                    repository.save(saved);
+
+                } catch (Exception ex) {
+                    System.err.println("Échec de la création de la branche GitHub : " + ex.getMessage());
+                }
+
+                // Send ticket to Kafka
                 UserDto manager = authFeignClientService.getManagerByProject(ticket.getProjectName());
-                System.out.println("📤 Envoi du ticket à Kafka avec managerId=" + manager.getId());
-                ticketProducer.sendTicket(ticket, manager.getId()); // ✅ Appel corrigé
+                System.out.println("Send ticket to Kafka with managerId=" + manager.getId());
+                ticketProducer.sendTicket(saved, manager.getId());
+
             } else {
-                System.err.println("⚠️ Projet trouvé mais ID nul : " + ticket.getProjectName());
+                System.err.println(" Projet found but ID nul : " + ticket.getProjectName());
             }
         } catch (Exception e) {
-            System.err.println("⚠️ Projet introuvable ou erreur lors de la récupération : " + ticket.getProjectName());
+            System.err.println("Projet not found or ou erreur lors de la récupération : " + ticket.getProjectName());
             e.printStackTrace();
         }
     }
+
 
     public void updateTicket(TicketEntity ticket) {
         repository.save(ticket); //  save sans appel Kafka

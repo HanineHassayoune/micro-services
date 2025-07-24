@@ -2,10 +2,12 @@ package edu.polytech.ticket.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.polytech.ticket.dto.TicketDto;
+import edu.polytech.ticket.entity.SolutionEntity;
 import edu.polytech.ticket.enums.Priority;
 import edu.polytech.ticket.enums.Status;
 import edu.polytech.ticket.entity.TicketEntity;
 import edu.polytech.ticket.feign.AuthFeignClientService;
+import edu.polytech.ticket.gitHub.GitHubService;
 import edu.polytech.ticket.repository.TicketRepository;
 import edu.polytech.ticket.service.TicketService;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +28,10 @@ public class TicketController {
     private final TicketService ticketService;
     private final TicketRepository ticketRepository;
     private final ObjectMapper mapper = new ObjectMapper();
-
+    private final GitHubService gitHubService;
     @PostMapping(consumes = {"application/json", "application/x-ndjson"})
     public void createFromFluentd(@RequestBody String rawLog) {
-        System.out.println("✅ RECEIVED NDJSON Ticket(s):\n" + rawLog);
+        System.out.println("RECEIVED NDJSON Ticket(s):\n" + rawLog);
         try {
             String[] jsonLines = rawLog.split("\\r?\\n");
             for (String line : jsonLines) {
@@ -62,7 +64,7 @@ public class TicketController {
                         .build();
 
                 ticketService.saveTicket(ticket);
-                System.out.println("🎫 Ticket enregistré depuis Fluentd !");
+                System.out.println("Ticket enregistré depuis Fluentd !");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,11 +90,11 @@ public class TicketController {
                     .build();
 
             ticketService.saveTicket(ticket);
-            System.out.println("🎫 Ticket created manually !");
-            return ResponseEntity.status(HttpStatus.CREATED).body("✅ Ticket created successfully!");
+            System.out.println("Ticket created manually !");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Ticket created successfully!");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("❌ Failed to create ticket.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create ticket.");
         }
     }
 
@@ -143,13 +145,55 @@ public class TicketController {
    }
 
     @PutMapping("/{ticketId}/status")
-    public ResponseEntity<TicketDto> updateTicketStatus(
+    public TicketDto updateTicketStatus(
             @PathVariable Integer ticketId,
-            @RequestParam("status") Status status
+            @RequestParam("status") Status newStatus
     ) {
-        TicketDto updated = ticketService.updateTicketStatus(ticketId, status);
-        return ResponseEntity.ok(updated);
+        TicketEntity ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+
+        Status oldStatus = ticket.getStatus();
+        ticket.setStatus(newStatus);
+
+        TicketEntity updated = ticketRepository.save(ticket);
+        SolutionEntity solution = ticket.getSolution();
+
+        if (solution != null) {
+            String fileName = "solution_ticket_" + ticket.getId() + ".java";
+            String content = solution.getCode();
+
+            try {
+                if (oldStatus == Status.IN_PROGRESS && newStatus == Status.RESOLVED) {
+                    // Push solution to dev branch
+                    gitHubService.pushFileToBranch(
+                            ticket.getProjectName(),
+                            "dev",
+                            fileName,
+                            content,
+                            "Solution ticket_" + ticket.getId() + " pushed to branch 'dev' (ticket RESOLVED)"
+
+                    );
+                } else if (oldStatus == Status.RESOLVED && newStatus == Status.MERGING) {
+                    // push solution (copy from) 'dev'
+                    gitHubService.copyFileBetweenBranches(
+                            ticket.getProjectName(),
+                            "dev",
+                            "staging",
+                            fileName,
+                            "Solution ticket_" + ticket.getId() + " pushed to branch 'staging' (ticket MERGING)"
+                    );
+                }
+            } catch (Exception e) {
+                System.err.println(" Error GitHub pour ticket " + ticket.getId() + " : " + e.getMessage());
+            }
+
+        } else {
+            System.out.println("No soltion à copier pour ce changement de statut.");
+        }
+
+        return ticketService.toDto(updated);
     }
+
 
     @PutMapping("/{ticketId}/priority")
     public ResponseEntity<TicketDto> updateTicketPriority(

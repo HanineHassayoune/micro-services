@@ -30,9 +30,9 @@ public class TicketProducer {
         try {
             String json = objectMapper.writeValueAsString(ticketDto);
             kafkaTemplate.send("ticket-topic", json);
-            log.info("📦 Ticket JSON publié dans Kafka : {}", json);
+            log.info("Ticket JSON publié dans Kafka : {}", json);
         } catch (Exception e) {
-            log.error("❌ Erreur de sérialisation du ticket : {}", e.getMessage());
+            log.error("Erreur de sérialisation du ticket : {}", e.getMessage());
         }
     }
 }

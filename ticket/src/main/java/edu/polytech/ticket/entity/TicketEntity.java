@@ -36,6 +36,10 @@ public class TicketEntity {
     private String stackTrace;
 
 
+    @Column(name = "branch_name")
+    private String branchName;
+
+
     @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL,orphanRemoval = true)
     private SolutionEntity solution;
 

@@ -24,20 +24,20 @@ public class TicketConsumer {
             groupId = "notification-group"
     )
     public void consumeTicket(String data) {
-        log.info("🎧 Kafka listener activé !");
-        log.info("📨 Message reçu : {}", data);
+        log.info("Kafka listener activé !");
+        log.info("Message reçu : {}", data);
 
         try {
             // Convertir le JSON reçu en objet TicketDto
             TicketDto ticket = objectMapper.readValue(data, TicketDto.class);
-            log.info("🎯 Nouveau ticket reçu via Kafka : {}", ticket.getTitle());
+            log.info("Nouveau ticket reçu via Kafka : {}", ticket.getTitle());
 
             // Construire la notification
             Notification notification = Notification.builder()
                     .title("Nouveau ticket : " + ticket.getTitle())
                     .message("Un ticket a été créé dans le projet " + ticket.getProjectName())
                     .ticketId(ticket.getId())
-                    .receiverId(ticket.getManagerId())  // ✅ utiliser directement le managerId transmis
+                    .receiverId(ticket.getManagerId())  // utiliser directement le managerId transmis
                     .build();
 
             // 1. Sauvegarde en base
@@ -55,7 +55,7 @@ public class TicketConsumer {
 
 
         } catch (Exception e) {
-            log.error("🚨 Erreur lors de la désérialisation ou traitement du ticket : {}", e.getMessage(), e);
+            log.error("Erreur lors de la désérialisation ou traitement du ticket : {}", e.getMessage(), e);
         }
     }
 }

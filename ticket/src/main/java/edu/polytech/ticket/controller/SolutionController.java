@@ -3,6 +3,8 @@ package edu.polytech.ticket.controller;
 import edu.polytech.ticket.dto.SolutionDto;
 import edu.polytech.ticket.entity.SolutionEntity;
 import edu.polytech.ticket.entity.TicketEntity;
+import edu.polytech.ticket.enums.Status;
+import edu.polytech.ticket.gitHub.GitHubService;
 import edu.polytech.ticket.repository.TicketRepository;
 import edu.polytech.ticket.service.SolutionService;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +23,19 @@ public class SolutionController {
 
     private final SolutionService service;
     private final TicketRepository ticketRepository;
+    private final GitHubService gitHubService;
 
     @PostMapping
     public ResponseEntity<Map<String, String>> saveSolution(@RequestBody SolutionDto dto) {
         // Recherche du ticket
         TicketEntity ticket = ticketRepository.findById(dto.getTicketId())
                 .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+
+        // Vérifie que le ticket est en IN_PROGRESS ==> add dolution to ticket only when status is IN_PROGRESS
+        if (ticket.getStatus() != Status.IN_PROGRESS) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "You can only add a solution when the ticket is in IN_PROGRESS status."));
+        }
 
         // Création de l'entité Solution
         SolutionEntity solution = SolutionEntity.builder()
@@ -40,9 +49,25 @@ public class SolutionController {
         // Appel au service avec vérification d'assignation
         service.saveSolution(solution, dto.getUserId());
 
-        // ✅ Réponse JSON : { "message": "Solution saved successfully." }
+        // Push le code dans la branche GitHub
+        String branch = ticket.getBranchName();
+        String fileName = "solution_ticket_" + ticket.getId() + ".java";
+        String commitMessage = "Add solution to ticket " + ticket.getId();
+
+        try {
+            gitHubService.pushFileToBranch(
+                    ticket.getProjectName(),
+                    branch,
+                    fileName,
+                    solution.getCode(),
+                    commitMessage
+            );
+        } catch (Exception e) {
+            System.err.println("Échec du push de solution sur GitHub : " + e.getMessage());
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message", "Solution saved successfully."));
+                .body(Map.of("message", "Solution saved and pushed successfully."));
     }
 
 
